@@ -28,6 +28,17 @@ def _is_comm(name: str) -> bool:
     return any(m in n for m in _COMM_MARKERS)
 
 
+def _event_cuda_us(e) -> float:
+    """Per-event GPU time, robust to the torch profiler attribute rename
+    (`self_cuda_time_total` -> `self_device_time_total` in newer PyTorch)."""
+    for attr in ("self_device_time_total", "self_cuda_time_total",
+                 "device_time_total", "cuda_time_total"):
+        v = getattr(e, attr, 0)
+        if v:
+            return float(v)
+    return 0.0
+
+
 def make_profiler(enabled: bool, trace_dir: str, tag: str, device: torch.device,
                   export: bool = True, active: int = 3, warmup: int = 1):
     """Return a profiler context manager (or a no-op if disabled / CPU).
@@ -70,7 +81,7 @@ def comm_overhead_fraction(prof) -> dict:
     comm_us = 0.0
     total_us = 0.0
     for e in events:
-        cuda_us = getattr(e, "self_cuda_time_total", 0) or getattr(e, "cuda_time_total", 0)
+        cuda_us = _event_cuda_us(e)
         if cuda_us <= 0:
             continue
         total_us += cuda_us
