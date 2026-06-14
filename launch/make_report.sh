@@ -6,12 +6,19 @@ cd "$(dirname "$0")/.."
 
 python3 -m distbench.plot
 
-mkdir -p results/examples
+mkdir -p results/examples results/examples/data
+
+# Figures
 cp results/plots/*.png results/examples/ 2>/dev/null || true
+# Raw numbers behind the figures (small JSON), so the repo carries the evidence
+cp results/runs/*.json results/examples/data/ 2>/dev/null || true
+cp results/sweep_summary.json results/examples/data/ 2>/dev/null || true
 
 echo
-echo "Figures regenerated and copied to results/examples/ (git-tracked):"
-ls -1 results/examples/
+echo "Staged into results/examples/ (git-tracked):"
+echo "  figures:"; ls -1 results/examples/*.png 2>/dev/null | sed 's/^/    /'
+echo "  data:"; ls -1 results/examples/data/ 2>/dev/null | sed 's/^/    /'
 echo
-echo "Publish them with:"
-echo "  git add results/examples && git commit -m 'add benchmark result figures' && git push"
+echo "Note: profiler traces (results/traces/*.json) can be large and stay gitignored."
+echo "Publish with:"
+echo "  git add results/examples && git commit -m 'add benchmark results' && git push"
