@@ -49,14 +49,23 @@ else
     echo "[run_all]   no GH_TOKEN set -- results will be built but not pushed"
 fi
 
-echo "[run_all] 4/6 fast 2-GPU smoke (fail here for ~\$0.50 instead of after the full sweep)"
+echo "[run_all] 4/6 fast 2-GPU smoke -- validates multi-GPU NCCL AND comm-overhead"
+echo "[run_all]     capture up front, so a problem fails here (~\$1) not after the sweep"
 python -m torch.distributed.run --standalone --nproc_per_node=2 -m distbench.train \
     --strategy fsdp --model 1b --seq-len 1024 --batch-size 1 \
-    --steps 3 --warmup 2 --dtype bf16 --out results/runs/_smoke.json
-python -c "import json; d=json.load(open('results/runs/_smoke.json')); \
-assert not d.get('oom') and d.get('tokens_per_sec_global'), 'multi-GPU smoke FAILED'; \
-print('[run_all]   2-GPU FSDP smoke OK: shard_ratio', d['sharding']['param_shard_ratio'], \
-'(should be ~2.0 -> sharding works across real GPUs)')"
+    --steps 3 --warmup 2 --dtype bf16 --profile --out results/runs/_smoke.json
+python - <<'PYCHECK'
+import json
+d = json.load(open('results/runs/_smoke.json'))
+assert not d.get('oom') and d.get('tokens_per_sec_global'), 'multi-GPU smoke FAILED (no throughput)'
+sr = d['sharding']['param_shard_ratio']
+comm = d.get('comm_fraction', 0.0)
+print(f"[run_all]     smoke: shard_ratio {sr:.1f} (want ~2.0) | comm-overhead {comm*100:.2f}%")
+assert sr > 1.5, 'FSDP did not shard across GPUs (shard_ratio should be ~2.0)'
+assert comm > 0.0, ('comm-overhead read 0 -- the profiler is not capturing NCCL kernels. '
+                    'ABORTING before the full sweep so you do not waste it.')
+print("[run_all]     OK: sharding AND comm-overhead both captured -> safe to run the full sweep")
+PYCHECK
 rm -f results/runs/_smoke.json
 
 echo "[run_all] 5/6 full sweep (GPUS=$GPUS) -- the ~30-45 min part"
