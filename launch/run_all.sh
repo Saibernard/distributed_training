@@ -68,6 +68,26 @@ print("[run_all]     OK: sharding AND comm-overhead both captured -> safe to run
 PYCHECK
 rm -f results/runs/_smoke.json
 
+# 8-GPU interconnect check: cloud 8x A100 nodes vary -- a true NVSwitch node
+# scales cleanly, but a mixed-topology node collapses (comm spikes, throughput
+# drops). Test it up front so a bad box aborts here (~\$1), not after the sweep.
+echo "[run_all] 4b/6 8-GPU interconnect check (is this a clean NVSwitch node?)"
+python -m torch.distributed.run --standalone --nproc_per_node=8 -m distbench.train \
+    --strategy ddp --model 1b --seq-len 1024 --batch-size 1 \
+    --steps 4 --warmup 3 --dtype bf16 --profile --out results/runs/_smoke8.json
+python - <<'PYCHECK'
+import json
+d = json.load(open('results/runs/_smoke8.json'))
+comm = d.get('comm_fraction', 0.0) * 100
+tps = d.get('tokens_per_sec_global', 0.0)
+print(f"[run_all]     8-GPU: {tps:,.0f} tok/s | comm-overhead {comm:.1f}%")
+assert comm < 30.0, (f"8-GPU comm-overhead is {comm:.1f}% -- this node's GPUs are NOT all on "
+                     "one NVSwitch (mixed topology). ABORT: delete this box and try another "
+                     "for a clean 8-GPU scaling curve.")
+print("[run_all]     OK: clean 8-GPU interconnect -> good node, running the full sweep")
+PYCHECK
+rm -f results/runs/_smoke8.json
+
 echo "[run_all] 5/6 full sweep (GPUS=$GPUS) -- the ~30-45 min part"
 GPUS="$GPUS" bash launch/run_sweep.sh
 bash launch/make_report.sh
