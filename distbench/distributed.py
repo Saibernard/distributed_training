@@ -44,7 +44,9 @@ def setup_distributed(force_cpu: bool = False) -> DistInfo:
     rank = int(os.environ.get("RANK", 0))
     local_rank = int(os.environ.get("LOCAL_RANK", 0))
     world_size = int(os.environ.get("WORLD_SIZE", 1))
-    launched = "RANK" in os.environ and world_size > 1
+    # Initialize a process group whenever a launcher set up the environment,
+    # even at world_size 1 (FSDP needs a group on a single GPU too).
+    launched = "RANK" in os.environ
 
     use_cuda = torch.cuda.is_available() and not force_cpu
     backend = "nccl" if use_cuda else "gloo"
@@ -113,6 +115,12 @@ def wrap_model(model: torch.nn.Module, strategy: str, info: DistInfo,
                 "FSDP on a GPU: Colab (1x A100) or the AWS 8x A100 box. The laptop "
                 "tier covers single-GPU and DDP correctness only."
             )
+        # FSDP needs a process group even on one GPU. If the trainer was started
+        # without a launcher (plain single-process run), stand up a 1-rank group.
+        if not dist.is_initialized():
+            os.environ.setdefault("MASTER_ADDR", "127.0.0.1")
+            os.environ.setdefault("MASTER_PORT", "29501")
+            dist.init_process_group(backend="nccl", rank=0, world_size=1)
         # Wrap each decoder block as its own FSDP unit so parameters are
         # gathered just-in-time per block and freed right after.
         auto_wrap = lambda module, recurse, nonwrapped_numel: transformer_auto_wrap_policy(
