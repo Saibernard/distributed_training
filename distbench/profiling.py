@@ -29,24 +29,28 @@ def _is_comm(name: str) -> bool:
 
 
 def make_profiler(enabled: bool, trace_dir: str, tag: str, device: torch.device,
-                  active: int = 3, warmup: int = 1):
+                  export: bool = True, active: int = 3, warmup: int = 1):
     """Return a profiler context manager (or a no-op if disabled / CPU).
 
     The profiler runs for `warmup + active` steps; call prof.step() each step.
+    All ranks must run the profiler so the collectives stay in sync, but only one
+    rank should `export` the trace -- otherwise every rank writes the same file
+    and they clobber each other (which also corrupts the in-memory comm stats).
     """
     if not enabled or device.type != "cuda":
         return nullcontext(), False
 
-    os.makedirs(trace_dir, exist_ok=True)
+    on_ready = None
+    if export:
+        os.makedirs(trace_dir, exist_ok=True)
 
-    def _on_ready(prof):
-        path = os.path.join(trace_dir, f"{tag}.json")
-        prof.export_chrome_trace(path)
+        def on_ready(prof):
+            prof.export_chrome_trace(os.path.join(trace_dir, f"{tag}.json"))
 
     prof = profile(
         activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
         schedule=schedule(wait=0, warmup=warmup, active=active, repeat=1),
-        on_trace_ready=_on_ready,
+        on_trace_ready=on_ready,
         record_shapes=False,
         with_stack=False,
     )

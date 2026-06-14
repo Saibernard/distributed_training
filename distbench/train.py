@@ -141,7 +141,10 @@ def run(args) -> dict:
 
         # --- short profiled window for NCCL overhead + trace ---
         comm = {"comm_fraction": 0.0, "comm_us": 0.0, "total_cuda_us": 0.0}
-        prof_cm, prof_on = make_profiler(args.profile, args.trace_dir, tag, info.device)
+        # All ranks profile (to keep collectives in sync) but only rank 0 writes
+        # the trace file, avoiding the multi-rank race that clobbers it.
+        prof_cm, prof_on = make_profiler(args.profile, args.trace_dir, tag,
+                                         info.device, export=info.is_main)
         if prof_on:
             with prof_cm as prof:
                 for _ in range(4):

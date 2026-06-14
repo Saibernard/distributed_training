@@ -37,6 +37,27 @@ python -m distbench.memory --model 8b --world-size 8
 
 The rest of the figures come from real runs (see the sweep below).
 
+## Results (measured on 8x A100 80GB)
+
+Throughput, tokens/sec, across 1/2/4/8 GPUs:
+
+| GPUs | DDP 1B | FSDP 1B | DDP 8B | FSDP 8B |
+|---|---|---|---|---|
+| 1 | 13,133 | 12,915 | OOM | OOM |
+| 2 | 22,412 | 27,038 | OOM | 4,685 |
+| 4 | 44,121 | 56,873 | OOM | 9,934 |
+| 8 | 87,562 | 114,882 | OOM | 20,415 |
+
+- DDP 1B reaches 83% scaling efficiency at 8 GPUs. FSDP 1B scaled super-linearly
+  (lower memory pressure, cheap all-gathers) and beat DDP at 8 GPUs.
+- An 8B model OOMs under DDP on an 80GB A100 at every GPU count, but trains under
+  FSDP FULL_SHARD. Measured peak memory per GPU drops 68.5 -> 37.4 -> 21.9 GB as
+  the shard widens (1/2 -> 1/4 -> 1/8), confirmed by the per-rank sharding report.
+
+![Peak memory: FSDP shards below the A100 limit](results/examples/peak_memory.png)
+
+Raw per-run JSON is in `results/examples/data/`.
+
 ## How the resume claims map to the code
 
 | Claim | Where it lives |
