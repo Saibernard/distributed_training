@@ -15,12 +15,13 @@ cd "$(dirname "$0")/.."
 GPUS="${GPUS:-1,2,4,8}"
 REPO="https://github.com/Saibernard/distributed_training.git"
 
-echo "[run_all] 1/6 installing deps"
+echo "[run_all] 1/6 installing deps (torch + libs, ~2-3 GB download -- give it a few minutes)"
 # We run everything via `python -m distbench...` from the repo root, so the
-# package itself does not need installing -- just its deps. (Editable installs
-# need a newer setuptools than some base images ship, which is why we avoid them.)
-pip install -q -U pip setuptools wheel >/dev/null 2>&1 || true
-pip install -q numpy matplotlib "transformers>=4.43" nvidia-ml-py >/dev/null
+# package itself does not need installing -- just its deps. Use `python -m pip`
+# so deps land in the same interpreter the rest of the script uses. Bare VMs do
+# not ship torch, so install it here (default Linux wheel is the CUDA build).
+python -m pip install -q -U pip setuptools wheel >/dev/null 2>&1 || true
+python -m pip install -q torch numpy matplotlib "transformers>=4.43" nvidia-ml-py
 
 echo "[run_all] 2/6 checking GPUs"
 python -c "import torch; assert torch.cuda.is_available(), 'no CUDA on this box'; \
@@ -40,7 +41,7 @@ else
 fi
 
 echo "[run_all] 4/6 fast 2-GPU smoke (fail here for ~\$0.50 instead of after the full sweep)"
-torchrun --standalone --nproc_per_node=2 -m distbench.train \
+python -m torch.distributed.run --standalone --nproc_per_node=2 -m distbench.train \
     --strategy fsdp --model 1b --seq-len 1024 --batch-size 1 \
     --steps 3 --warmup 2 --dtype bf16 --out results/runs/_smoke.json
 python -c "import json; d=json.load(open('results/runs/_smoke.json')); \

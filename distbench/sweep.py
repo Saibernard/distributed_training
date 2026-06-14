@@ -100,8 +100,8 @@ def run_job(job: dict, out_dir: str) -> str:
         cmd = [sys.executable, _here("launch", "spawn_local.py"),
                "--nproc", str(job["nproc"]), "--"] + train_args
     else:
-        cmd = ["torchrun", "--standalone", f"--nproc_per_node={job['nproc']}",
-               "-m", "distbench.train"] + train_args
+        cmd = [sys.executable, "-m", "torch.distributed.run", "--standalone",
+               f"--nproc_per_node={job['nproc']}", "-m", "distbench.train"] + train_args
 
     print(f"\n=== {job['strategy']} {job['model']} x{job['nproc']} ===")
     print(" ".join(cmd))
