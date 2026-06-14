@@ -16,12 +16,17 @@ GPUS="${GPUS:-1,2,4,8}"
 REPO="https://github.com/Saibernard/distributed_training.git"
 
 echo "[run_all] 1/6 installing deps (torch + libs, ~2-3 GB download -- give it a few minutes)"
-# We run everything via `python -m distbench...` from the repo root, so the
-# package itself does not need installing -- just its deps. Use `python -m pip`
-# so deps land in the same interpreter the rest of the script uses. Bare VMs do
-# not ship torch, so install it here (default Linux wheel is the CUDA build).
-python -m pip install -q -U pip setuptools wheel >/dev/null 2>&1 || true
-python -m pip install -q torch numpy matplotlib "transformers>=4.43" nvidia-ml-py
+# We run everything via `python -m distbench...` from the repo root, so only the
+# deps are needed. Bare VMs do not ship torch. Some Brev images use `uv` and
+# their venv has no pip, so detect the available installer.
+DEPS='torch numpy matplotlib transformers>=4.43 nvidia-ml-py'
+if command -v uv >/dev/null 2>&1; then
+    uv pip install -q $DEPS
+else
+    python -m ensurepip --upgrade >/dev/null 2>&1 || true
+    python -m pip install -q -U pip setuptools wheel >/dev/null 2>&1 || true
+    python -m pip install -q $DEPS
+fi
 
 echo "[run_all] 2/6 checking GPUs"
 python -c "import torch; assert torch.cuda.is_available(), 'no CUDA on this box'; \
