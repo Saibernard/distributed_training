@@ -17,15 +17,19 @@ REPO="https://github.com/Saibernard/distributed_training.git"
 
 echo "[run_all] 1/6 installing deps (torch + libs, ~2-3 GB download -- give it a few minutes)"
 # We run everything via `python -m distbench...` from the repo root, so only the
-# deps are needed. Bare VMs do not ship torch. Some Brev images use `uv` and
-# their venv has no pip, so detect the available installer.
-DEPS='torch numpy matplotlib transformers>=4.43 nvidia-ml-py'
+# deps are needed. Bare VMs do not ship torch; many GPU boxes have an older CUDA
+# driver, so pin torch to the cu121 build (works with driver CUDA >= 12.1).
+# Some Brev images use `uv` and their venv has no pip, so detect the installer.
+TORCH_IDX="https://download.pytorch.org/whl/cu121"
+PYPI_DEPS='numpy matplotlib transformers>=4.43 nvidia-ml-py'
 if command -v uv >/dev/null 2>&1; then
-    uv pip install -q $DEPS
+    uv pip install -q --reinstall-package torch torch --index-url "$TORCH_IDX"
+    uv pip install -q $PYPI_DEPS
 else
     python -m ensurepip --upgrade >/dev/null 2>&1 || true
     python -m pip install -q -U pip setuptools wheel >/dev/null 2>&1 || true
-    python -m pip install -q $DEPS
+    python -m pip install -q --force-reinstall torch --index-url "$TORCH_IDX"
+    python -m pip install -q $PYPI_DEPS
 fi
 
 echo "[run_all] 2/6 checking GPUs"
