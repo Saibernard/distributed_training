@@ -16,7 +16,11 @@ GPUS="${GPUS:-1,2,4,8}"
 REPO="https://github.com/Saibernard/distributed_training.git"
 
 echo "[run_all] 1/6 installing deps"
-pip install -e ".[gpu]" >/dev/null
+# We run everything via `python -m distbench...` from the repo root, so the
+# package itself does not need installing -- just its deps. (Editable installs
+# need a newer setuptools than some base images ship, which is why we avoid them.)
+pip install -q -U pip setuptools wheel >/dev/null 2>&1 || true
+pip install -q numpy matplotlib "transformers>=4.43" nvidia-ml-py >/dev/null
 
 echo "[run_all] 2/6 checking GPUs"
 python -c "import torch; assert torch.cuda.is_available(), 'no CUDA on this box'; \
