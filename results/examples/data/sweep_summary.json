@@ -19,15 +19,15 @@
       "param_shard_ratio": 1.0,
       "optimizer_state_mb_per_rank": 9886.5152
     },
-    "tokens_per_sec_global": 13146.927575062788,
-    "tokens_per_sec_per_gpu": 13146.927575062788,
-    "step_time_ms": 155.7778414999916,
+    "tokens_per_sec_global": 13169.642234045836,
+    "tokens_per_sec_per_gpu": 13169.642234045836,
+    "step_time_ms": 155.50915989999794,
     "peak_alloc_gb": 24.745750528,
     "peak_reserved_gb": 26.495418368,
-    "gpu_util_pct": 99.9375,
+    "gpu_util_pct": 99.93333333333334,
     "comm_fraction": 0.0,
     "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "total_cuda_us": 2402921.2319999845
   },
   {
     "strategy": "ddp",
@@ -49,15 +49,15 @@
       "param_shard_ratio": 1.0,
       "optimizer_state_mb_per_rank": 9886.5152
     },
-    "tokens_per_sec_global": 13132.768883250086,
-    "tokens_per_sec_per_gpu": 13132.768883250086,
-    "step_time_ms": 155.94578860000183,
+    "tokens_per_sec_global": 13164.800179820752,
+    "tokens_per_sec_per_gpu": 13164.800179820752,
+    "step_time_ms": 155.56635665000158,
     "peak_alloc_gb": 24.745750528,
     "peak_reserved_gb": 26.495418368,
     "gpu_util_pct": 99.875,
     "comm_fraction": 0.0,
     "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "total_cuda_us": 2397214.770999997
   },
   {
     "strategy": "ddp",
@@ -94,15 +94,15 @@
       "param_shard_ratio": 1.0,
       "optimizer_state_mb_per_rank": 9886.5152
     },
-    "tokens_per_sec_global": 12914.817310651912,
-    "tokens_per_sec_per_gpu": 12914.817310651912,
-    "step_time_ms": 158.57754319999913,
+    "tokens_per_sec_global": 12971.20831211376,
+    "tokens_per_sec_per_gpu": 12971.20831211376,
+    "step_time_ms": 157.88814355000227,
     "peak_alloc_gb": 22.24228352,
     "peak_reserved_gb": 32.839303168,
     "gpu_util_pct": 98.52941176470588,
     "comm_fraction": 0.0,
     "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "total_cuda_us": 2882150.9449999994
   },
   {
     "strategy": "fsdp",
@@ -139,15 +139,15 @@
       "param_shard_ratio": 1.0,
       "optimizer_state_mb_per_rank": 9886.5152
     },
-    "tokens_per_sec_global": 22412.311987346755,
-    "tokens_per_sec_per_gpu": 11206.155993673377,
-    "step_time_ms": 182.75669204999758,
+    "tokens_per_sec_global": 22463.50711887194,
+    "tokens_per_sec_per_gpu": 11231.75355943597,
+    "step_time_ms": 182.34018304999609,
     "peak_alloc_gb": 29.690048512,
     "peak_reserved_gb": 31.348228096,
-    "gpu_util_pct": 99.8157894736842,
-    "comm_fraction": 0.0,
-    "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "gpu_util_pct": 99.94736842105263,
+    "comm_fraction": 0.1210014524456777,
+    "comm_us": 448218.1390000015,
+    "total_cuda_us": 3704237.6759999986
   },
   {
     "strategy": "ddp",
@@ -184,15 +184,15 @@
       "param_shard_ratio": 2.0,
       "optimizer_state_mb_per_rank": 4943.2576
     },
-    "tokens_per_sec_global": 27037.588531529396,
-    "tokens_per_sec_per_gpu": 13518.794265764698,
-    "step_time_ms": 151.49280029997954,
+    "tokens_per_sec_global": 27109.69963486305,
+    "tokens_per_sec_per_gpu": 13554.849817431525,
+    "step_time_ms": 151.08983334999948,
     "peak_alloc_gb": 14.830489088,
-    "peak_reserved_gb": 20.371734528,
-    "gpu_util_pct": 99.625,
-    "comm_fraction": 0.0,
-    "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "peak_reserved_gb": 20.774387712,
+    "gpu_util_pct": 99.67857142857142,
+    "comm_fraction": 0.08916402491155578,
+    "comm_us": 300177.46000000037,
+    "total_cuda_us": 3366575.9290000037
   },
   {
     "strategy": "fsdp",
@@ -214,15 +214,15 @@
       "param_shard_ratio": 2.0,
       "optimizer_state_mb_per_rank": 32121.044992
     },
-    "tokens_per_sec_global": 4685.159458804015,
-    "tokens_per_sec_per_gpu": 2342.5797294020076,
-    "step_time_ms": 874.2498597999884,
+    "tokens_per_sec_global": 4661.150779790274,
+    "tokens_per_sec_per_gpu": 2330.575389895137,
+    "step_time_ms": 878.7529504000076,
     "peak_alloc_gb": 68.462645248,
-    "peak_reserved_gb": 80.578871296,
-    "gpu_util_pct": 99.52114845938377,
-    "comm_fraction": 0.0,
-    "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "peak_reserved_gb": 79.071019008,
+    "gpu_util_pct": 99.42099863201094,
+    "comm_fraction": 0.0862151617899026,
+    "comm_us": 1805913.248000002,
+    "total_cuda_us": 20946585.38600003
   },
   {
     "strategy": "ddp",
@@ -244,15 +244,15 @@
       "param_shard_ratio": 1.0,
       "optimizer_state_mb_per_rank": 9886.5152
     },
-    "tokens_per_sec_global": 44121.0167221111,
-    "tokens_per_sec_per_gpu": 11030.254180527774,
-    "step_time_ms": 185.67115195000952,
+    "tokens_per_sec_global": 44150.64465982802,
+    "tokens_per_sec_per_gpu": 11037.661164957006,
+    "step_time_ms": 185.5465546000005,
     "peak_alloc_gb": 29.692137472,
     "peak_reserved_gb": 30.78619136,
-    "gpu_util_pct": 99.94736842105263,
-    "comm_fraction": 0.0,
-    "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "gpu_util_pct": 99.96052631578948,
+    "comm_fraction": 0.12626402861301914,
+    "comm_us": 479246.0610000008,
+    "total_cuda_us": 3795586.6469999957
   },
   {
     "strategy": "ddp",
@@ -289,15 +289,15 @@
       "param_shard_ratio": 4.0,
       "optimizer_state_mb_per_rank": 2471.6288
     },
-    "tokens_per_sec_global": 56873.37539214995,
-    "tokens_per_sec_per_gpu": 14218.343848037488,
-    "step_time_ms": 144.03927925000062,
+    "tokens_per_sec_global": 56820.59560342187,
+    "tokens_per_sec_per_gpu": 14205.148900855467,
+    "step_time_ms": 144.17307515000175,
     "peak_alloc_gb": 11.121153536,
-    "peak_reserved_gb": 15.019802624,
-    "gpu_util_pct": 99.54999999999998,
-    "comm_fraction": 0.0,
-    "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "peak_reserved_gb": 15.017705472,
+    "gpu_util_pct": 99.48333333333335,
+    "comm_fraction": 0.10490300019237034,
+    "comm_us": 351425.31500000035,
+    "total_cuda_us": 3350002.5199999926
   },
   {
     "strategy": "fsdp",
@@ -319,15 +319,15 @@
       "param_shard_ratio": 4.0,
       "optimizer_state_mb_per_rank": 16060.522496
     },
-    "tokens_per_sec_global": 9933.9309862818,
-    "tokens_per_sec_per_gpu": 2483.48274657045,
-    "step_time_ms": 824.6483704499951,
-    "peak_alloc_gb": 37.392072192,
-    "peak_reserved_gb": 45.128613888,
-    "gpu_util_pct": 99.276509009009,
-    "comm_fraction": 0.0,
-    "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "tokens_per_sec_global": 9848.615107992026,
+    "tokens_per_sec_per_gpu": 2462.1537769980064,
+    "step_time_ms": 831.7920753499948,
+    "peak_alloc_gb": 37.392121344,
+    "peak_reserved_gb": 45.250248704,
+    "gpu_util_pct": 98.98392803372478,
+    "comm_fraction": 0.12789038625827964,
+    "comm_us": 2931406.9729999946,
+    "total_cuda_us": 22921245.753999863
   },
   {
     "strategy": "ddp",
@@ -349,15 +349,15 @@
       "param_shard_ratio": 1.0,
       "optimizer_state_mb_per_rank": 9886.5152
     },
-    "tokens_per_sec_global": 87562.17989325385,
-    "tokens_per_sec_per_gpu": 10945.272486656731,
-    "step_time_ms": 187.11274684999353,
-    "peak_alloc_gb": 29.691039744,
-    "peak_reserved_gb": 31.534874624,
-    "gpu_util_pct": 99.94736842105263,
-    "comm_fraction": 0.0,
-    "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "tokens_per_sec_global": 21530.77110996482,
+    "tokens_per_sec_per_gpu": 2691.3463887456023,
+    "step_time_ms": 760.9574183999939,
+    "peak_alloc_gb": 29.690056704,
+    "peak_reserved_gb": 30.589059072,
+    "gpu_util_pct": 99.97115384615384,
+    "comm_fraction": 0.4863299111414223,
+    "comm_us": 6707886.077000003,
+    "total_cuda_us": 13792871.718000054
   },
   {
     "strategy": "ddp",
@@ -394,15 +394,15 @@
       "param_shard_ratio": 8.0,
       "optimizer_state_mb_per_rank": 1235.8144
     },
-    "tokens_per_sec_global": 114881.68522524467,
-    "tokens_per_sec_per_gpu": 14360.210653155584,
-    "step_time_ms": 142.61629229999926,
+    "tokens_per_sec_global": 32120.668597154865,
+    "tokens_per_sec_per_gpu": 4015.083574644358,
+    "step_time_ms": 510.0765555500061,
     "peak_alloc_gb": 9.305783808,
     "peak_reserved_gb": 12.075401216,
-    "gpu_util_pct": 99.16488095238095,
-    "comm_fraction": 0.0,
-    "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "gpu_util_pct": 99.97519607843138,
+    "comm_fraction": 0.32109456396387365,
+    "comm_us": 4384945.019000003,
+    "total_cuda_us": 13656241.839999987
   },
   {
     "strategy": "fsdp",
@@ -424,14 +424,14 @@
       "param_shard_ratio": 8.0,
       "optimizer_state_mb_per_rank": 8030.261248
     },
-    "tokens_per_sec_global": 20415.32730157963,
-    "tokens_per_sec_per_gpu": 2551.9159126974537,
-    "step_time_ms": 802.5342801500074,
+    "tokens_per_sec_global": 5052.976850107354,
+    "tokens_per_sec_per_gpu": 631.6221062634193,
+    "step_time_ms": 3242.4450944499995,
     "peak_alloc_gb": 21.8563968,
-    "peak_reserved_gb": 29.251076096,
-    "gpu_util_pct": 99.16287325543655,
-    "comm_fraction": 0.0,
-    "comm_us": 0.0,
-    "total_cuda_us": 0.0
+    "peak_reserved_gb": 28.726788096,
+    "gpu_util_pct": 99.90927110243427,
+    "comm_fraction": 0.32507193030405557,
+    "comm_us": 28670523.925999977,
+    "total_cuda_us": 88197476.47600038
   }
 ]
