@@ -1,0 +1,8 @@
+# Core. Install the CUDA build of torch on GPU hosts (see README / Dockerfile);
+# the default wheel is fine for laptop CPU/MPS development.
+torch>=2.3
+numpy>=1.24
+matplotlib>=3.7
+
+# Optional but recommended on NVIDIA hosts for accurate GPU utilization sampling.
+nvidia-ml-py>=12.535  # provides the `pynvml` module

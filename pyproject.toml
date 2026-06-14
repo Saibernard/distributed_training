@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "distbench"
+version = "0.1.0"
+description = "PyTorch distributed-training benchmark: single-GPU -> DDP -> FSDP for Llama 8B-class models"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "torch>=2.3",
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+gpu = ["nvidia-ml-py>=12.535"]
+
+[tool.setuptools]
+packages = ["distbench"]

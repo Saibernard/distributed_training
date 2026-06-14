@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Benchmark outputs (keep the directory, ignore the large artifacts)
+results/runs/*.json
+results/traces/*.json
+results/plots/*.png
+sweep_summary.json
+results/sweep_summary.json
+
+# Keep curated example results checked in under results/examples/ instead.
+!results/examples/**
+
+# Local tooling / editor
+.claude/
+.DS_Store
+.idea/
+.vscode/
+*.swp

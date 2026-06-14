@@ -1,0 +1,12 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+.venv
+venv
+results/runs
+results/traces
+results/plots
+notebooks
+docs
+.DS_Store
