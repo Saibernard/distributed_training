@@ -87,6 +87,7 @@ _BF16 = MixedPrecision(
 
 
 def wrap_model(model: torch.nn.Module, strategy: str, info: DistInfo,
+               transformer_layer_cls=None,
                activation_checkpointing: bool = False,
                mixed_precision: bool = True) -> torch.nn.Module:
     """Return the model wrapped for the chosen strategy.
@@ -121,17 +122,20 @@ def wrap_model(model: torch.nn.Module, strategy: str, info: DistInfo,
             os.environ.setdefault("MASTER_ADDR", "127.0.0.1")
             os.environ.setdefault("MASTER_PORT", "29501")
             dist.init_process_group(backend="nccl", rank=0, world_size=1)
+        # The decoder block class to shard at: TransformerBlock for the native
+        # model, LlamaDecoderLayer for the HuggingFace model.
+        layer_cls = transformer_layer_cls or TransformerBlock
         # Wrap each decoder block as its own FSDP unit so parameters are
         # gathered just-in-time per block and freed right after.
         auto_wrap = lambda module, recurse, nonwrapped_numel: transformer_auto_wrap_policy(
-            module, recurse, nonwrapped_numel, transformer_layer_cls={TransformerBlock}
+            module, recurse, nonwrapped_numel, transformer_layer_cls={layer_cls}
         )
         if activation_checkpointing:
             # Re-compute block activations in backward to trade compute for memory.
             wrapper = lambda m: checkpoint_wrapper(m, checkpoint_impl=CheckpointImpl.NO_REENTRANT)
             apply_activation_checkpointing(
                 model, checkpoint_wrapper_fn=wrapper,
-                check_fn=lambda m: isinstance(m, TransformerBlock),
+                check_fn=lambda m: isinstance(m, layer_cls),
             )
         return FSDP(
             model,
@@ -147,7 +151,7 @@ def wrap_model(model: torch.nn.Module, strategy: str, info: DistInfo,
     raise ValueError(f"unknown strategy '{strategy}'")
 
 
-def sharding_report(model, optimizer, cfg, info) -> dict:
+def sharding_report(optimizer, global_params, info) -> dict:
     """Hard evidence of what each rank actually holds.
 
     This makes the FSDP FULL_SHARD claim verifiable rather than inferred from the
@@ -155,8 +159,9 @@ def sharding_report(model, optimizer, cfg, info) -> dict:
     its param groups give the local parameter count and its state gives the local
     optimizer-state size. Under FULL_SHARD both are ~1/world_size of the global
     model; under DDP they equal the global model (full replica per rank).
+
+    global_params is the true total parameter count of the unwrapped model.
     """
-    global_params = cfg.num_params()
     local_params = sum(
         p.numel() for g in optimizer.param_groups for p in g["params"]
     )

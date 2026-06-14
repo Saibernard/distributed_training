@@ -159,3 +159,52 @@ class LlamaModel(nn.Module):
 
 def build_model(cfg: ModelConfig) -> LlamaModel:
     return LlamaModel(cfg)
+
+
+def build_hf_model(cfg: ModelConfig, pretrained: bool = False,
+                   hf_id: str | None = None, dtype=torch.bfloat16):
+    """Build the model using HuggingFace transformers' official LlamaForCausalLM.
+
+    This makes the model provably Llama (Meta/HF's own class), not a
+    reimplementation. With pretrained=False we construct a LlamaConfig from our
+    ModelConfig, which for the 8b config is exactly the Llama-3.1-8B architecture
+    -- no gated download, random init, and the benchmark numbers are identical
+    because throughput and memory depend on shape, not weight values.
+
+    With pretrained=True it loads the real checkpoint (needs `huggingface-cli
+    login` and license acceptance); this changes no benchmark number, it just
+    starts from trained weights.
+
+    The transformer block class for FSDP wrapping is LlamaDecoderLayer.
+    """
+    from transformers import LlamaConfig, LlamaForCausalLM
+
+    if pretrained:
+        if not hf_id:
+            raise ValueError("pretrained=True needs an hf_id, e.g. meta-llama/Llama-3.1-8B")
+        return LlamaForCausalLM.from_pretrained(hf_id, torch_dtype=dtype, use_cache=False)
+
+    lc = LlamaConfig(
+        vocab_size=cfg.vocab_size,
+        hidden_size=cfg.dim,
+        intermediate_size=cfg.ffn_hidden,
+        num_hidden_layers=cfg.n_layers,
+        num_attention_heads=cfg.n_heads,
+        num_key_value_heads=cfg.n_kv_heads,
+        max_position_embeddings=cfg.max_seq_len,
+        rope_theta=cfg.rope_theta,
+        rms_norm_eps=cfg.norm_eps,
+        tie_word_embeddings=cfg.tie_embeddings,
+        use_cache=False,
+    )
+    try:
+        lc._attn_implementation = "sdpa"   # flash-style attention on CUDA
+    except Exception:
+        pass
+    return LlamaForCausalLM(lc)
+
+
+def hf_layer_cls():
+    """The LlamaDecoderLayer class, used as the FSDP/checkpoint wrap unit."""
+    from transformers.models.llama.modeling_llama import LlamaDecoderLayer
+    return LlamaDecoderLayer

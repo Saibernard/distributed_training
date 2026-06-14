@@ -10,6 +10,15 @@ so the same code runs in three places: my laptop for correctness, a single Colab
 A100 for profiling, and an 8x A100 box for the real numbers. One trainer, one set
 of launch scripts, no rewrite between "learning" and "results".
 
+The model is HuggingFace transformers' official `LlamaForCausalLM` at the exact
+Llama-3.1-8B config (`--impl hf`, the default). Because this is a throughput and
+memory benchmark, the weight *values* do not matter: FLOPs, activation memory,
+parameter/gradient/optimizer memory, and communication volume depend only on the
+model shape and dtype. So it runs with random init and synthetic tokens by
+default (no gated download, identical numbers), and `--hf-pretrained` loads the
+real Llama checkpoint if you want to start from trained weights. A dependency-free
+in-repo implementation is available as `--impl native`.
+
 ## What it shows
 
 The headline is the memory story. Training an 8B model with Adam in mixed
@@ -32,7 +41,7 @@ The rest of the figures come from real runs (see the sweep below).
 
 | Claim | Where it lives |
 |---|---|
-| Single-GPU profiling -> multi-GPU DDP/FSDP, Llama 8B-class | `distbench/train.py` (one trainer, `--strategy single\|ddp\|fsdp`), `distbench/model.py` (Llama arch: RMSNorm, RoPE, GQA, SwiGLU), `distbench/config.py` (1B and 8B configs) |
+| Single-GPU profiling -> multi-GPU DDP/FSDP, Llama 8B-class | `distbench/train.py` (one trainer, `--strategy single\|ddp\|fsdp`), `distbench/model.py` (HF `LlamaForCausalLM` at the Llama-3.1-8B config; native impl too), `distbench/config.py` (exact 1B/8B Llama shapes) |
 | Quantify DDP vs FSDP: tokens/sec, scaling efficiency, GPU util, NCCL overhead, peak memory | `distbench/metrics.py`, `distbench/profiling.py`, aggregated by `distbench/sweep.py` and `distbench/plot.py` |
 | FSDP FULL_SHARD shards params, grads, optimizer state beyond single/DDP limits | `distbench/distributed.py` (FSDP FULL_SHARD + activation checkpointing), `distbench/memory.py` (analytic), `sharding_report` (measured per-rank ownership, in every run's JSON and `sharding.png`), the 8B+DDP OOM recorded by the sweep |
 | Dockerized workflows, launch scripts, profiler traces, performance plots | `docker/`, `launch/`, `results/traces/`, `results/plots/` |

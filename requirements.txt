@@ -3,6 +3,9 @@
 torch>=2.3
 numpy>=1.24
 matplotlib>=3.7
+# HuggingFace transformers provides the official LlamaForCausalLM (the default
+# model impl). >=4.43 for the Llama-3.1/3.2 configs.
+transformers>=4.43
 
 # Optional but recommended on NVIDIA hosts for accurate GPU utilization sampling.
 nvidia-ml-py>=12.535  # provides the `pynvml` module

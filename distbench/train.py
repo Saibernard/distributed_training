@@ -20,13 +20,13 @@ from contextlib import nullcontext
 
 import torch
 
-from .config import get_model_config, list_models
+from .config import get_model_config, get_hf_id, list_models
 from .data import SyntheticTokenLoader
 from .distributed import setup_distributed, cleanup_distributed, wrap_model, sharding_report
 from .metrics import (
     Stopwatch, reset_peak_memory, peak_memory_gb, reduce_value, GpuUtilSampler,
 )
-from .model import build_model
+from .model import build_model, build_hf_model, hf_layer_cls, TransformerBlock
 from .profiling import make_profiler, comm_overhead_fraction
 
 
@@ -34,6 +34,13 @@ def parse_args():
     ap = argparse.ArgumentParser(description="distbench trainer")
     ap.add_argument("--strategy", choices=["single", "ddp", "fsdp"], default="single")
     ap.add_argument("--model", choices=list_models(), default="1b")
+    ap.add_argument("--impl", choices=["hf", "native"], default="hf",
+                    help="hf = HuggingFace LlamaForCausalLM (the real Llama); "
+                         "native = the in-repo Llama implementation")
+    ap.add_argument("--hf-pretrained", action="store_true",
+                    help="load the real pretrained weights (needs HF login); "
+                         "does not change benchmark numbers, just the starting weights")
+    ap.add_argument("--hf-id", default=None, help="override the HuggingFace model id")
     ap.add_argument("--seq-len", type=int, default=2048)
     ap.add_argument("--batch-size", type=int, default=1, help="micro-batch per GPU")
     ap.add_argument("--grad-accum", type=int, default=1)
@@ -78,9 +85,19 @@ def run(args) -> dict:
 
     try:
         torch.manual_seed(1234 + info.rank)
-        model = build_model(cfg)
+        if args.impl == "hf":
+            hf_id = args.hf_id or (get_hf_id(args.model) if args.hf_pretrained else None)
+            model = build_hf_model(cfg, pretrained=args.hf_pretrained, hf_id=hf_id)
+            layer_cls = hf_layer_cls()
+        else:
+            model = build_model(cfg)
+            layer_cls = TransformerBlock
+        result["impl"] = args.impl
+        # True total parameter count, measured before sharding.
+        total_params = sum(p.numel() for p in model.parameters())
+
         model = wrap_model(
-            model, args.strategy, info,
+            model, args.strategy, info, transformer_layer_cls=layer_cls,
             activation_checkpointing=args.activation_checkpointing,
             mixed_precision=not args.no_mixed_precision,
         )
@@ -89,12 +106,18 @@ def run(args) -> dict:
         loader = SyntheticTokenLoader(cfg.vocab_size, args.batch_size, seq_len,
                                       info.device, seed=info.rank)
 
+        is_hf = args.impl == "hf"
+
         def one_step():
             optimizer.zero_grad(set_to_none=True)
             for _ in range(args.grad_accum):
                 inputs, targets = loader.next()
                 with _autocast_ctx(info.device, args.dtype):
-                    _, loss = model(inputs, targets)
+                    if is_hf:
+                        # HF computes the causal-LM loss internally from labels.
+                        loss = model(input_ids=inputs, labels=inputs).loss
+                    else:
+                        _, loss = model(inputs, targets)
                     loss = loss / args.grad_accum
                 loss.backward()
             optimizer.step()
@@ -106,7 +129,7 @@ def run(args) -> dict:
             one_step()
 
         # Hard evidence of sharding (optimizer state now populated by warmup).
-        result["sharding"] = sharding_report(model, optimizer, cfg, info)
+        result["sharding"] = sharding_report(optimizer, total_params, info)
 
         # --- timed window ---
         watch = Stopwatch(info.device)

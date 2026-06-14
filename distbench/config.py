@@ -62,15 +62,32 @@ _CONFIGS = {
         name="debug", vocab_size=8192, dim=512, n_layers=4, n_heads=8,
         n_kv_heads=4, ffn_hidden=1536, max_seq_len=512, tie_embeddings=True,
     ),
+    # Exact Llama-3.2-1B shape.
     "1b": ModelConfig(
-        name="1b", vocab_size=128256, dim=2048, n_layers=16, n_heads=16,
-        n_kv_heads=8, ffn_hidden=5632, max_seq_len=8192, tie_embeddings=True,
+        name="1b", vocab_size=128256, dim=2048, n_layers=16, n_heads=32,
+        n_kv_heads=8, ffn_hidden=8192, max_seq_len=131072, tie_embeddings=True,
     ),
+    # Exact Llama-3.1-8B shape.
     "8b": ModelConfig(
         name="8b", vocab_size=128256, dim=4096, n_layers=32, n_heads=32,
-        n_kv_heads=8, ffn_hidden=14336, max_seq_len=8192, tie_embeddings=False,
+        n_kv_heads=8, ffn_hidden=14336, max_seq_len=131072, tie_embeddings=False,
     ),
 }
+
+
+# Real HuggingFace ids, used by the `hf` model impl when loading pretrained
+# weights. Our 1b/8b configs match these models' shapes exactly, so building a
+# LlamaConfig from our values reproduces the same architecture with no download.
+_HF_IDS = {
+    "8b": "meta-llama/Llama-3.1-8B",
+    "1b": "meta-llama/Llama-3.2-1B",
+}
+
+
+def get_hf_id(name: str) -> str:
+    if name not in _HF_IDS:
+        raise KeyError(f"no HuggingFace id for '{name}' (pretrained only for {sorted(_HF_IDS)})")
+    return _HF_IDS[name]
 
 
 def get_model_config(name: str) -> ModelConfig:
