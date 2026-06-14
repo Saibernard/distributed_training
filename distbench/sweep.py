@@ -60,11 +60,11 @@ def build_matrix(args) -> list[dict]:
             # 1B: both DDP and FSDP fit -> compare overhead and scaling.
             jobs.append(dict(nproc=n, strategy=strat, model="1b", seq_len=args.seq_len,
                              batch_size=args.batch_size, steps=args.steps, warmup=args.warmup,
-                             dtype="bf16", ac=False, force_cpu=False, profile=(n == counts[-1])))
+                             dtype="bf16", ac=False, force_cpu=False, profile=True))
             # 8B: DDP expected to OOM, FSDP expected to fit with checkpointing.
             jobs.append(dict(nproc=n, strategy=strat, model="8b", seq_len=args.seq_len,
                              batch_size=args.batch_size, steps=args.steps, warmup=args.warmup,
-                             dtype="bf16", ac=True, force_cpu=False, profile=(n == counts[-1])))
+                             dtype="bf16", ac=True, force_cpu=False, profile=True))
     return jobs
 
 
