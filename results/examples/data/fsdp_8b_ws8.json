@@ -1,0 +1,30 @@
+{
+  "strategy": "fsdp",
+  "model": "8b",
+  "world_size": 8,
+  "seq_len": 2048,
+  "batch_size": 1,
+  "grad_accum": 1,
+  "dtype": "bf16",
+  "activation_checkpointing": true,
+  "num_params_b": 8.030261248,
+  "device": "cuda",
+  "backend": "nccl",
+  "oom": false,
+  "impl": "hf",
+  "sharding": {
+    "global_params": 8030261248,
+    "local_params_per_rank": 1003782656,
+    "param_shard_ratio": 8.0,
+    "optimizer_state_mb_per_rank": 8030.261248
+  },
+  "tokens_per_sec_global": 20415.32730157963,
+  "tokens_per_sec_per_gpu": 2551.9159126974537,
+  "step_time_ms": 802.5342801500074,
+  "peak_alloc_gb": 21.8563968,
+  "peak_reserved_gb": 29.251076096,
+  "gpu_util_pct": 99.16287325543655,
+  "comm_fraction": 0.0,
+  "comm_us": 0.0,
+  "total_cuda_us": 0.0
+}
