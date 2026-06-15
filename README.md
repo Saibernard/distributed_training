@@ -43,16 +43,19 @@ Throughput, tokens/sec, across 1/2/4/8 GPUs:
 
 | GPUs | DDP 1B | FSDP 1B | DDP 8B | FSDP 8B |
 |---|---|---|---|---|
-| 1 | 13,133 | 12,915 | OOM | OOM |
-| 2 | 22,412 | 27,038 | OOM | 4,685 |
-| 4 | 44,121 | 56,873 | OOM | 9,934 |
-| 8 | 87,562 | 114,882 | OOM | 20,415 |
+| 1 | 13,196 | 12,941 | OOM | OOM |
+| 2 | 22,381 | 26,827 | OOM | 4,571 |
+| 4 | 43,923 | 55,504 | OOM | 9,568 |
+| 8 | 86,561 | 112,408 | OOM | 19,842 |
 
-- DDP 1B reaches 83% scaling efficiency at 8 GPUs. FSDP 1B scaled super-linearly
+- DDP 1B reaches 82% scaling efficiency at 8 GPUs. FSDP 1B scaled super-linearly
   (lower memory pressure, cheap all-gathers) and beat DDP at 8 GPUs.
 - An 8B model OOMs under DDP on an 80GB A100 at every GPU count, but trains under
   FSDP FULL_SHARD. Measured peak memory per GPU drops 68.5 -> 37.4 -> 21.9 GB as
   the shard widens (1/2 -> 1/4 -> 1/8), confirmed by the per-rank sharding report.
+- NCCL communication overhead grows with GPU count (DDP 1B: 11.5 -> 13.8 -> 15.7%
+  at 2/4/8 GPUs), and depends on node interconnect: a mixed-topology node showed
+  ~48% overhead and collapsed at 8 GPUs, while a clean NVSwitch node held ~16%.
 
 ![Peak memory: FSDP shards below the A100 limit](results/examples/peak_memory.png)
 
