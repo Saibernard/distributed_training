@@ -18,13 +18,13 @@
     "param_shard_ratio": 2.0,
     "optimizer_state_mb_per_rank": 4943.2576
   },
-  "tokens_per_sec_global": 27109.69963486305,
-  "tokens_per_sec_per_gpu": 13554.849817431525,
-  "step_time_ms": 151.08983334999948,
+  "tokens_per_sec_global": 26826.867515196205,
+  "tokens_per_sec_per_gpu": 13413.433757598103,
+  "step_time_ms": 152.68275350000522,
   "peak_alloc_gb": 14.830489088,
-  "peak_reserved_gb": 20.774387712,
-  "gpu_util_pct": 99.67857142857142,
-  "comm_fraction": 0.08916402491155578,
-  "comm_us": 300177.46000000037,
-  "total_cuda_us": 3366575.9290000037
+  "peak_reserved_gb": 20.019412992,
+  "gpu_util_pct": 98.9375,
+  "comm_fraction": 0.08583313591445413,
+  "comm_us": 285626.93900000025,
+  "total_cuda_us": 3327700.147000003
 }
