@@ -1,0 +1,30 @@
+{
+  "strategy": "ddp",
+  "model": "1b",
+  "world_size": 4,
+  "seq_len": 2048,
+  "batch_size": 1,
+  "grad_accum": 1,
+  "dtype": "bf16",
+  "activation_checkpointing": false,
+  "num_params_b": 1.2358144,
+  "device": "cuda",
+  "backend": "nccl",
+  "oom": false,
+  "impl": "hf",
+  "sharding": {
+    "global_params": 1235814400,
+    "local_params_per_rank": 1235814400,
+    "param_shard_ratio": 1.0,
+    "optimizer_state_mb_per_rank": 9886.5152
+  },
+  "tokens_per_sec_global": 44150.64465982802,
+  "tokens_per_sec_per_gpu": 11037.661164957006,
+  "step_time_ms": 185.5465546000005,
+  "peak_alloc_gb": 29.692137472,
+  "peak_reserved_gb": 30.78619136,
+  "gpu_util_pct": 99.96052631578948,
+  "comm_fraction": 0.12626402861301914,
+  "comm_us": 479246.0610000008,
+  "total_cuda_us": 3795586.6469999957
+}

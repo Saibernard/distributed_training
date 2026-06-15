@@ -25,3 +25,9 @@ results/sweep_summary.json
 .idea/
 .vscode/
 *.swp
+
+# Private interview-prep notes (not for the public repo)
+prep/
+
+# Keep the degraded-node run for comparison
+!results/old_gpu_run_degraded_node/**

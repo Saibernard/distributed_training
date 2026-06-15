@@ -59,7 +59,11 @@ Throughput, tokens/sec, across 1/2/4/8 GPUs:
 
 ![Peak memory: FSDP shards below the A100 limit](results/examples/peak_memory.png)
 
-Raw per-run JSON is in `results/examples/data/`.
+Raw per-run JSON is in `results/examples/data/`. For comparison, an earlier run
+on a mixed-topology node (where 8-GPU scaling collapsed to ~20% with ~48% NCCL
+overhead) is kept under
+[results/old_gpu_run_degraded_node/](results/old_gpu_run_degraded_node/) — same
+spec, different interconnect.
 
 ## How the resume claims map to the code
 

@@ -1,0 +1,15 @@
+{
+  "strategy": "ddp",
+  "model": "8b",
+  "world_size": 8,
+  "seq_len": 2048,
+  "batch_size": 1,
+  "grad_accum": 1,
+  "dtype": "bf16",
+  "activation_checkpointing": true,
+  "num_params_b": 8.030261248,
+  "device": "cuda",
+  "backend": "nccl",
+  "oom": true,
+  "impl": "hf"
+}
